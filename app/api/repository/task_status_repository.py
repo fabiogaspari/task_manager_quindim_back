@@ -5,10 +5,8 @@ from pymongo.errors import PyMongoError
 
 from app.config.db.database import task_statuses_collection
 from app.api.model.task_status_model import TaskStatusModel
-from app.api.model.user_model import UserModel
 from app.util.format.serialize_util import objectid_to_str
 from app.api.repository.contract.default_interface_repository import DefaultInterfaceRepository
-from app.api.service.user_service import UserService
 from app.util.repository.repository_util import RepositoryUtil
 
 class TaskStatusRepository(DefaultInterfaceRepository):
@@ -39,7 +37,7 @@ class TaskStatusRepository(DefaultInterfaceRepository):
         user_email = get_jwt_identity()
 
         field_dict = {
-            "_id": task_status_id,
+            "_id": ObjectId(task_status_id),
             "user.email": user_email
         }
         task_status = RepositoryUtil.find_or_fail(task_statuses_collection, field_dict)
@@ -65,7 +63,6 @@ class TaskStatusRepository(DefaultInterfaceRepository):
 
         RepositoryUtil.allowed_by_id(task_statuses_collection, task_status_id)
 
-        update_data["user_id"] = user_id
         result = task_statuses_collection.update_one(
             {"user.email": user_email},
             {"$set": update_data}

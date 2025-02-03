@@ -51,7 +51,7 @@ def get(task_status_id) -> jsonify:
 def update(task_status_id) -> jsonify:
     try:
         task_status = TaskStatusService.update(task_status_id)
-        return jsonify({"msg": "O status da tarefa foi modificada com sucesso.", "task": task}), 200
+        return jsonify({"msg": "O status da tarefa foi modificada com sucesso.", "task": task_status}), 200
     except ValueError as e:
         print(e)
         return jsonify({"errors": ControllerUtil.treat_value_error(e)}), 400

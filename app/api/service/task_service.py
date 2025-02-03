@@ -44,18 +44,20 @@ class TaskService(InterfaceService):
                     user=user
                 )
                 task_status_id = TaskStatusRepository.create(task_status)
-        title = data.get("title")
-        expiration_date = data.get("expiration_date")
         try: 
             task_status["_id"] = objectid_to_str(task_status["_id"])
         except:
             pass
 
+        title = data.get("title")
+        expiration_date = data.get("expiration_date")
+            
         task = TaskModel(
             title=title,
             status=task_status,
             expiration_date=expiration_date,
-            user=user
+            user=user,
+            created_at=datetime.now()
         )
         task_id = TaskRepository.create(task)
 
