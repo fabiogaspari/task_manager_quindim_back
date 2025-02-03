@@ -13,6 +13,8 @@ from . import task_status_auth_bp
 def create() -> jsonify:
     try:
         task_status_id = TaskStatusService.create()
+        cache.delete(f"task_status_get_all{get_jwt_identity()}")
+        cache.delete(f"task_status_get{get_jwt_identity()}")
         return jsonify({"msg": "Status da tarefa criado com sucesso", "id": task_status_id}), 201
     except ValueError as e:
         print(e)
@@ -23,7 +25,7 @@ def create() -> jsonify:
     
 @task_status_auth_bp.route("/all", methods=["GET"])
 @jwt_required()
-@cache.cached(timeout=60, key_prefix=lambda: f"task_status_{get_jwt_identity()}")
+@cache.cached(key_prefix=lambda: f"task_status_get_all{get_jwt_identity()}")
 def get_all() -> jsonify:
     try:
         task_statuses = TaskStatusService.get_all()
@@ -34,7 +36,8 @@ def get_all() -> jsonify:
     except Exception as e:
         print(e)
         return jsonify({"msg": "Ocorreu um erro inesperado. Por favor, tente mais tarde."}), 500
-    
+
+@cache.cached(key_prefix=lambda: f"task_status_get{get_jwt_identity()}")  
 @task_status_auth_bp.route("/<task_status_id>", methods=["GET"])
 @jwt_required()
 def get(task_status_id) -> jsonify:
@@ -52,8 +55,10 @@ def get(task_status_id) -> jsonify:
 @jwt_required()
 def update(task_status_id) -> jsonify:
     try:
-        task_status = TaskStatusService.update(task_status_id)
-        return jsonify({"msg": "O status da tarefa foi modificada com sucesso.", "task": task_status}), 200
+        TaskStatusService.update(task_status_id)
+        cache.delete(f"task_status_get_all{get_jwt_identity()}")
+        cache.delete(f"task_status_get{get_jwt_identity()}")
+        return jsonify({"msg": "O status da tarefa foi modificada com sucesso."}), 200
     except ValueError as e:
         print(e)
         return jsonify({"errors": ControllerUtil.treat_value_error(e)}), 400
@@ -71,6 +76,8 @@ def update(task_status_id) -> jsonify:
 def delete(task_status_id) -> jsonify:
     try:
         if TaskStatusService.delete(task_status_id):
+            cache.delete(f"task_status_get_all{get_jwt_identity()}")
+            cache.delete(f"task_status_get{get_jwt_identity()}")
             return jsonify({"msg": "Sucesso ao excluir o registro."}), 200
     except AttributeError as e:
         print(e)

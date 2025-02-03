@@ -44,12 +44,11 @@ class AuthService:
         jti = jwt["jti"]
 
         if not jti:
-            return False
+            raise PermissionError("O usuário não tem permissão para realizar essa ação.")
         
         try:
             deleted = redis_client.delete(jti)
             return deleted > 0
         except ConnectionError as e:
-            print("Erro ao acessar o Redis:", e)
             return False
     
