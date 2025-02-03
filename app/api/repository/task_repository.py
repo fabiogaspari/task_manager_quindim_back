@@ -30,8 +30,6 @@ class TaskRepository(DefaultInterfaceRepository):
         for task in task_list:
             task["_id"] = objectid_to_str(task["_id"])
         
-        print(task_list)
-
         return task_list
 
     @staticmethod
