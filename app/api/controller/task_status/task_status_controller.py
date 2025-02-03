@@ -13,6 +13,8 @@ from . import task_status_auth_bp
 def create() -> jsonify:
     try:
         task_status_id = TaskStatusService.create()
+        cache.delete(f"task_get_all{get_jwt_identity()}")
+        cache.delete(f"task_get{get_jwt_identity()}")
         cache.delete(f"task_status_get_all{get_jwt_identity()}")
         cache.delete(f"task_status_get{get_jwt_identity()}")
         return jsonify({"msg": "Status da tarefa criado com sucesso", "id": task_status_id}), 201
@@ -56,6 +58,8 @@ def get(task_status_id) -> jsonify:
 def update(task_status_id) -> jsonify:
     try:
         TaskStatusService.update(task_status_id)
+        cache.delete(f"task_get_all{get_jwt_identity()}")
+        cache.delete(f"task_get{get_jwt_identity()}")
         cache.delete(f"task_status_get_all{get_jwt_identity()}")
         cache.delete(f"task_status_get{get_jwt_identity()}")
         return jsonify({"msg": "O status da tarefa foi modificada com sucesso."}), 200
@@ -76,6 +80,8 @@ def update(task_status_id) -> jsonify:
 def delete(task_status_id) -> jsonify:
     try:
         if TaskStatusService.delete(task_status_id):
+            cache.delete(f"task_get_all{get_jwt_identity()}")
+            cache.delete(f"task_get{get_jwt_identity()}")
             cache.delete(f"task_status_get_all{get_jwt_identity()}")
             cache.delete(f"task_status_get{get_jwt_identity()}")
             return jsonify({"msg": "Sucesso ao excluir o registro."}), 200

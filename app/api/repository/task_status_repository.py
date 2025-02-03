@@ -63,26 +63,39 @@ class TaskStatusRepository(DefaultInterfaceRepository):
     def update(task_status_id, update_data) -> bool:
         user_email = get_jwt_identity()
 
-        obj = RepositoryUtil.allowed_by_id(task_statuses_collection, task_status_id)
-        search_dict = {}
+        old_task_status = RepositoryUtil.allowed_by_id(task_statuses_collection, task_status_id)
 
         result = task_statuses_collection.update_one(
             {"user.email": user_email, "_id": ObjectId(task_status_id)},
             {"$set": update_data}
         )
-
-        search_dict["status.name"] = obj["name"]
-        search_dict["status.status_color"] = obj["status_color"]
-        search_dict["status.status_color_font"] = obj["status_color_font"]
-        search_dict["status.description"] = obj["description"]
         task_status = task_statuses_collection.find_one({"_id": ObjectId(task_status_id)})
-        task_status["_id"] = objectid_to_str(task_status["_id"])
-        tasks = tasks_collection.find(search_dict)
-        for task in tasks:
-            task["status"] = task_status
-            tasks_collection.update_many(search_dict, {"$set": task})
         
-        return RepositoryUtil.modified(result)
+        search_dict = {}
+        search_dict["status.name"] = old_task_status["name"]
+        search_dict["status.status_color"] = old_task_status["status_color"]
+        search_dict["status.status_color_font"] = old_task_status["status_color_font"]
+        search_dict["status.description"] = old_task_status["description"]
+        tasks = tasks_collection.find(search_dict)
+        updated = RepositoryUtil.modified(result)
+
+        task_list = list(tasks)
+        
+        if updated:
+            for task in task_list:
+                try:
+                    task_status["_id"] = objectid_to_str(task_status["_id"])
+                except:
+                    task_status["_id"] = task_status["_id"]
+                task_id = task["_id"]
+                task.pop("_id")
+                task["status"] = task_status
+                tasks_collection.update_one(
+                    {"_id": task_id}, {"$set": task}
+                )
+        
+        print(1)
+        return updated
 
     @staticmethod
     def delete(task_status_id) -> bool:

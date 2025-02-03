@@ -16,6 +16,8 @@ def create() -> jsonify:
         task_id = TaskService.create()
         cache.delete(f"task_get_all{get_jwt_identity()}")
         cache.delete(f"task_get{get_jwt_identity()}")
+        cache.delete(f"task_status_get_all{get_jwt_identity()}")
+        cache.delete(f"task_status_get{get_jwt_identity()}")
         return jsonify({"msg": "Tarefa criada com sucesso", "id": str(task_id)}), 201
     except ValueError as e:
         print(e)
@@ -61,6 +63,8 @@ def update(task_id) -> jsonify:
         TaskService.update(task_id)
         cache.delete(f"task_get_all{get_jwt_identity()}")
         cache.delete(f"task_get{get_jwt_identity()}")
+        cache.delete(f"task_status_get_all{get_jwt_identity()}")
+        cache.delete(f"task_status_get{get_jwt_identity()}")
         return jsonify({"msg": "A tarefa foi modificada com sucesso."}), 200
     except ValueError as e:
         print(e)
@@ -81,6 +85,8 @@ def delete(task_id) -> jsonify:
         if TaskService.delete(task_id):
             cache.delete(f"task_get_all{get_jwt_identity()}")
             cache.delete(f"task_get{get_jwt_identity()}")
+            cache.delete(f"task_status_get_all{get_jwt_identity()}")
+            cache.delete(f"task_status_get{get_jwt_identity()}")
             return jsonify({"msg": "Sucesso ao excluir o registro."}), 200
     except AttributeError as e:
         print(e)
