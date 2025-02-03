@@ -13,7 +13,7 @@ from . import auth_user_bp
 def create():
     try:
         user_id = AuthService.register()
-        return jsonify({"msg": "Usuário criado com sucesso", "user_id": user_id}), 201
+        return jsonify({"msg": "Usuário criado com sucesso", "id": user_id}), 201
     except PyMongoError as e:
         print(e)
         return jsonify({"msg": str(2)}), 400

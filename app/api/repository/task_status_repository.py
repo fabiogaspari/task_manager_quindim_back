@@ -65,15 +65,15 @@ class TaskStatusRepository(DefaultInterfaceRepository):
         obj = RepositoryUtil.allowed_by_id(task_statuses_collection, task_status_id)
         search_dict = {}
 
+        result = task_statuses_collection.update_one(
+            {"user.email": user_email, "_id": ObjectId(task_status_id)},
+            {"$set": update_data}
+        )
+
         search_dict["status.name"] = obj["name"]
         search_dict["status.status_color"] = obj["status_color"]
         search_dict["status.status_color_font"] = obj["status_color_font"]
         search_dict["status.description"] = obj["description"]
-        
-        result = task_statuses_collection.update_one(
-            {"user.email": user_email, "_id": task_status_id},
-            {"$set": update_data}
-        )
         task_status = task_statuses_collection.find_one({"_id": ObjectId(task_status_id)})
         task_status["_id"] = objectid_to_str(task_status["_id"])
         tasks = tasks_collection.find(search_dict)

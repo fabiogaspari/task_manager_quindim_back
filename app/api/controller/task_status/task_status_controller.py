@@ -12,7 +12,7 @@ from . import task_status_auth_bp
 def create() -> jsonify:
     try:
         task_status_id = TaskStatusService.create()
-        return jsonify({"msg": "Status da tarefa criado com sucesso", "task_status_id": task_status_id}), 201
+        return jsonify({"msg": "Status da tarefa criado com sucesso", "id": task_status_id}), 201
     except ValueError as e:
         print(e)
         return jsonify({"errors": ControllerUtil.treat_value_error(e)}), 400

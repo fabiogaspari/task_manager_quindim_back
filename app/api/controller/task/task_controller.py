@@ -13,7 +13,7 @@ from . import task_auth_bp
 def create() -> jsonify:
     try:
         task_id = TaskService.create()
-        return jsonify({"msg": "Tarefa criada com sucesso", "task_id": str(task_id)}), 201
+        return jsonify({"msg": "Tarefa criada com sucesso", "id": str(task_id)}), 201
     except ValueError as e:
         print(e)
         return jsonify({"errors": ControllerUtil.treat_value_error(e)}), 400
