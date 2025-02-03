@@ -5,6 +5,7 @@ from flask_cors import CORS
 from app.config.settings import Config
 from app.config.db.database import redis_client
 from app.config.config import init_extensions, cache
+from app.config.cache import cache
 
 def create_app():
     app = Flask(__name__)
@@ -14,6 +15,11 @@ def create_app():
 
     JWTManager(app)
     redis_client.init_app(app)
+
+    app.config['CACHE_TYPE'] = 'RedisCache'
+    app.config['CACHE_REDIS_URL'] = 'redis://localhost:6379/0'
+
+    cache.init_app(app)
 
     init_extensions(app)
 

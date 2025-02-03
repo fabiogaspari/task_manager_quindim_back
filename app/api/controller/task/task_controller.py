@@ -1,10 +1,11 @@
 from flask import jsonify
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 from app.api.service.task_service import TaskService
 from app.api.exception.task_status_on_task_not_found import TaskStatusOnTaskNotFound
 from app.api.exception.object_not_modified import ObjectNotModified
 from app.util.controller.controller_util import ControllerUtil
+from app.config.cache import cache
 
 from . import task_auth_bp
 
@@ -25,6 +26,7 @@ def create() -> jsonify:
 
 @task_auth_bp.route("/all", methods=["GET"])
 @jwt_required()
+@cache.cached(timeout=60, key_prefix=lambda: f"task_{get_jwt_identity()}")
 def get_all() -> jsonify:
     try:
         tasks = TaskService.get_all()

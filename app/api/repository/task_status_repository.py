@@ -9,6 +9,7 @@ from app.api.model.task_status_model import TaskStatusModel
 from app.util.format.serialize_util import objectid_to_str
 from app.api.repository.contract.default_interface_repository import DefaultInterfaceRepository
 from app.util.repository.repository_util import RepositoryUtil
+from app.config.cache import cache
 
 class TaskStatusRepository(DefaultInterfaceRepository):
     @staticmethod
