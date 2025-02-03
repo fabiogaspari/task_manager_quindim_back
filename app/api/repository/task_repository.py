@@ -63,7 +63,7 @@ class TaskRepository(DefaultInterfaceRepository):
 
         RepositoryUtil.allowed_by_id(tasks_collection, task_id)
         result = tasks_collection.update_one(
-            {"user.email": user_email},
+            {"user.email": user_email, "_id": ObjectId(task_id)},
             {"$set": update_data}
         )
 

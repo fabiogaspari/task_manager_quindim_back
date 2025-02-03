@@ -29,10 +29,10 @@ class RepositoryUtil:
             "_id": ObjectId(obj_id),
             "user.email": user_email
         }
-        user: UserModel = collection.find_one(field_dict)
-        RepositoryUtil.exist(user)
+        obj = collection.find_one(field_dict)
+        RepositoryUtil.exist(obj)
 
-        return user
+        return obj
     
     def allowed_by_user(collection) -> UserModel:
         user_email = get_jwt_identity()

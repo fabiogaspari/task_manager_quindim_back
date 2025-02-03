@@ -3,6 +3,7 @@ from bson import ObjectId
 from typing import List
 from pymongo.errors import PyMongoError
 
+from app.config.db.database import tasks_collection
 from app.config.db.database import task_statuses_collection
 from app.api.model.task_status_model import TaskStatusModel
 from app.util.format.serialize_util import objectid_to_str
@@ -61,13 +62,25 @@ class TaskStatusRepository(DefaultInterfaceRepository):
     def update(task_status_id, update_data) -> bool:
         user_email = get_jwt_identity()
 
-        RepositoryUtil.allowed_by_id(task_statuses_collection, task_status_id)
+        obj = RepositoryUtil.allowed_by_id(task_statuses_collection, task_status_id)
+        search_dict = {}
 
+        search_dict["status.name"] = obj["name"]
+        search_dict["status.status_color"] = obj["status_color"]
+        search_dict["status.status_color_font"] = obj["status_color_font"]
+        search_dict["status.description"] = obj["description"]
+        
         result = task_statuses_collection.update_one(
-            {"user.email": user_email},
+            {"user.email": user_email, "_id": task_status_id},
             {"$set": update_data}
         )
-
+        task_status = task_statuses_collection.find_one({"_id": ObjectId(task_status_id)})
+        task_status["_id"] = objectid_to_str(task_status["_id"])
+        tasks = tasks_collection.find(search_dict)
+        for task in tasks:
+            task["status"] = task_status
+            tasks_collection.update_many(search_dict, {"$set": task})
+        
         return RepositoryUtil.modified(result)
 
     @staticmethod
