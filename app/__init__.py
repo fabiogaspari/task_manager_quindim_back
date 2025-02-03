@@ -1,9 +1,10 @@
 from flask import Flask
 from flask_jwt_extended import JWTManager
+from flask_cors import CORS
+
 from app.config.settings import Config
 from app.config.db.database import redis_client
 from app.config.config import init_extensions, cache
-from flask_cors import CORS
 
 def create_app():
     app = Flask(__name__)

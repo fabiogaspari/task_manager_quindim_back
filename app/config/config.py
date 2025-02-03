@@ -1,8 +1,9 @@
 from flask_jwt_extended import JWTManager
 from flask_redis import FlaskRedis
 from pymongo import MongoClient
-from app.config.settings import Config
 from flask_caching import Cache
+
+from app.config.settings import Config
 
 jwt = JWTManager()
 redis_client = FlaskRedis()
