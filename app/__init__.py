@@ -22,12 +22,7 @@ def create_app():
     init_extensions(app)
 
     app.config['CACHE_TYPE'] = 'RedisCache'
-    app.config['CACHE_REDIS_URL'] = 'redis://localhost:6379/0'
-
-    app.config['CACHE_TYPE'] = 'RedisCache'
-    app.config['CACHE_REDIS_HOST'] = 'localhost'
-    app.config['CACHE_REDIS_PORT'] = 6379
-    app.config['CACHE_DEFAULT_TIMEOUT'] = 300
+    app.config['CACHE_REDIS_URL'] = 'redis://redis:6379/0'  # Corrigido para usar o nome do serviço Redis no Docker
 
     from app.api.controller.auth import auth_bp
     from app.api.controller.task import task_auth_bp

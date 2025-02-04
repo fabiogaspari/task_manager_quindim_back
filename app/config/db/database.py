@@ -10,7 +10,7 @@ redis_client = FlaskRedis()
 
 
 def init_redis(app):
-    redis_client.init_app(app, config_prefix='CACHE')
+    redis_client.init_app(app)
 
 def wait_for_mongo():
     """ Aguarda o MongoDB estar disponível antes de continuar. """
