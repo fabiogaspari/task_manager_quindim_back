@@ -11,9 +11,3 @@ Para esse microserviço do backend, foi utilizada a linguagem Python com o frame
 
 # Utilizarios
 1. Para desenvolver o projeto do backend, primeiro foi desenvolvido o Diagrama de Entidade e Relacionamento, com a ferramenta drawia. Um arquivo exportado desse diagrama, no formado .png, se encontra na raiz do projeto no github.
-
-# PROJETO AINDA EM ANDAMENTO
-## Próximos passos
-2. Desenvolver os testes unitários
-3. Desenvolver arquivo bash para criação das imagens Docker
-4. Desenvolver endpoint de métricas
