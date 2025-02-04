@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./task_manager_quindim_back
+    ports:
+      - "5000:5000"
+    depends_on:
+      - redis
+      - mongo
+    environment:
+      - FLASK_APP=run.py
+      - FLASK_RUN_HOST=0.0.0.0
+      - MONGO_URI=mongodb://mongo:27017/
+      - MONGO_DB_NAME=task_manager
+    volumes:
+      - ./task_manager_quindim_back:/app
+    restart: unless-stopped
+
+  frontend:
+    build: ./task_manager_quindim
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://backend:5000
+    volumes:
+      - ./task_manager_quindim:/app
+      - /app/node_modules
+    restart: unless-stopped
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.runCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
