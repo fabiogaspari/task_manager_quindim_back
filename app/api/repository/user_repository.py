@@ -4,7 +4,7 @@ from typing import List
 
 from app.api.model.user_model import UserModel
 from app.api.model.response.user_response import UserResponse
-from app.config.db.database import users_collection
+from app.config.db.mongo_connection import MongoConnection
 from app.util.format.serialize_util import objectid_to_str
 from app.api.repository.contract.user_interface_repository import UserInterfaceRepository
 from app.util.repository.repository_util import RepositoryUtil
@@ -12,7 +12,7 @@ from app.util.repository.repository_util import RepositoryUtil
 class UserRepository(UserInterfaceRepository):
     @staticmethod
     def create(user: UserModel) -> str:
-        result = users_collection.insert_one(user)
+        result = MongoConnection.get_collection('user').insert_one(user)
         if not result:
             raise PyMongoError("Erro ao criar o usuário no banco de dados.")
         return str(result.inserted_id)
@@ -24,7 +24,7 @@ class UserRepository(UserInterfaceRepository):
         field_dict = {
             "email": user_email
         }
-        users: UserModel = users_collection.find(field_dict)
+        users: UserModel = MongoConnection.get_collection('user').find(field_dict)
         user_list = list(users)
         
         for user in user_list:
@@ -40,7 +40,7 @@ class UserRepository(UserInterfaceRepository):
             "username": username,
             "email": user_email
         }
-        user: UserModel = RepositoryUtil.find_or_fail(users_collection, field_dict)
+        user: UserModel = RepositoryUtil.find_or_fail(MongoConnection.get_collection('user'), field_dict)
         user["_id"] = objectid_to_str(user["_id"])
         
         return UserResponse(objectid_to_str(user["_id"]), user["username"], user["email"]).to_dict()
@@ -53,7 +53,7 @@ class UserRepository(UserInterfaceRepository):
             field_dict = {
                 "email": user_email
             }
-            user: UserModel = RepositoryUtil.find_or_fail(users_collection, field_dict)
+            user: UserModel = RepositoryUtil.find_or_fail(MongoConnection.get_collection('user'), field_dict)
         else:
             raise PermissionError("Usuário ou senha incorretos.")
         
@@ -63,9 +63,9 @@ class UserRepository(UserInterfaceRepository):
     def update(update_data) -> bool:
         user_email = get_jwt_identity()
 
-        RepositoryUtil.allowed_by_user(users_collection)
+        RepositoryUtil.allowed_by_user(MongoConnection.get_collection('user'))
 
-        result = users_collection.update_one(
+        result = MongoConnection.get_collection('user').update_one(
             {"email": user_email},
             {"$set": update_data}
         )
@@ -74,7 +74,7 @@ class UserRepository(UserInterfaceRepository):
 
     @staticmethod
     def delete() -> bool:
-        RepositoryUtil.allowed_by_user(users_collection)
+        RepositoryUtil.allowed_by_user(MongoConnection.get_collection('user'))
 
         field_data = {
             "is_deactivated": True

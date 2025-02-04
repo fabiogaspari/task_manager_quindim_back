@@ -2,7 +2,7 @@ from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 from flask_jwt_extended import get_jwt_identity
 
-from app.config.db.database import task_statuses_collection
+from app.config.db.mongo_connection import MongoConnection
 
 class TaskStatusModel(BaseModel):
     user: dict
@@ -25,7 +25,7 @@ class TaskStatusModel(BaseModel):
     @field_validator('name')
     def unique_name(cls, value):
         user_email = get_jwt_identity()
-        if task_statuses_collection.find_one({"name": value, "user.email": user_email}):
+        if MongoConnection.get_collection('task_status').find_one({"name": value, "user.email": user_email}):
             raise ValueError(f"O nome '{value}' já está em uso.")
         return value
     

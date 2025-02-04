@@ -1,5 +1,5 @@
 from flask import jsonify
-from flask_jwt_extended import jwt_required
+import logging
 
 from app.api.service.auth.auth_service import AuthService
 
@@ -13,5 +13,5 @@ def login() -> jsonify:
     except PermissionError as e:
         return jsonify({"msg": str(e)}), 400
     except Exception as e:
-        print(e)
+        logging.error(f"Erro no sistema: {e}")
         return jsonify({"msg": "Erro ao realizar o login. Por favor, verifique as informações ou tente mais tarde."}), 400

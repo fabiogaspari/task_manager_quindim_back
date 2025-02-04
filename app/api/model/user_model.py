@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 
-from app.config.db.database import users_collection
+from app.config.db.mongo_connection import MongoConnection
 
 class UserModel(BaseModel):
     username: str = Field(..., min_length=3, max_length=50)
@@ -19,7 +19,7 @@ class UserModel(BaseModel):
 
     @field_validator('email')
     def unique_email(cls, value):
-        if users_collection.find_one({"email": value}):
+        if MongoConnection.get_collection('user').find_one({"email": value}):
             raise ValueError(f"O email '{value}' já está em uso.")
         return value
     

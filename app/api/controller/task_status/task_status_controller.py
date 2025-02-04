@@ -1,5 +1,6 @@
 from flask import jsonify
 from flask_jwt_extended import jwt_required, get_jwt_identity
+import logging
 
 from app.api.service.task_status_service import TaskStatusService
 from app.api.exception.object_not_modified import ObjectNotModified
@@ -19,10 +20,10 @@ def create() -> jsonify:
         cache.delete(f"task_status_get{get_jwt_identity()}")
         return jsonify({"msg": "Status da tarefa criado com sucesso", "id": task_status_id}), 201
     except ValueError as e:
-        print(e)
+        logging.error(f"Erro no sistema: {e}")
         return jsonify({"errors": ControllerUtil.treat_value_error(e)}), 400
     except Exception as e:
-        print(e)
+        logging.error(f"Erro no sistema: {e}")
         return jsonify({"msg": "Ocorreu um erro inesperado. Por favor, tente mais tarde."}), 500
     
 @task_status_auth_bp.route("/all", methods=["GET"])
@@ -33,10 +34,10 @@ def get_all() -> jsonify:
         task_statuses = TaskStatusService.get_all()
         return jsonify(task_statuses), 200
     except AttributeError as e:
-        print(e)
+        logging.error(f"Erro no sistema: {e}")
         return jsonify({"msg": "Os status da tarefa não foram encontrada."}), 400
     except Exception as e:
-        print(e)
+        logging.error(f"Erro no sistema: {e}")
         return jsonify({"msg": "Ocorreu um erro inesperado. Por favor, tente mais tarde."}), 500
 
 @cache.cached(key_prefix=lambda: f"task_status_get{get_jwt_identity()}")  
@@ -47,10 +48,10 @@ def get(task_status_id) -> jsonify:
         task_status = TaskStatusService.get_by_id(task_status_id)
         return jsonify(task_status), 200
     except AttributeError as e:
-        print(e)
+        logging.error(f"Erro no sistema: {e}")
         return jsonify({"msg": "O status da tarefa não foi encontrada."}), 400
     except Exception as e:
-        print(e)
+        logging.error(f"Erro no sistema: {e}")
         return jsonify({"msg": "Ocorreu um erro inesperado. Por favor, tente mais tarde."}), 500
 
 @task_status_auth_bp.route("/<task_status_id>", methods=["PUT"])
@@ -64,15 +65,15 @@ def update(task_status_id) -> jsonify:
         cache.delete(f"task_status_get{get_jwt_identity()}")
         return jsonify({"msg": "O status da tarefa foi modificada com sucesso."}), 200
     except ValueError as e:
-        print(e)
+        logging.error(f"Erro no sistema: {e}")
         return jsonify({"errors": ControllerUtil.treat_value_error(e)}), 400
     except AttributeError as e:
-        print(e)
+        logging.error(f"Erro no sistema: {e}")
         return jsonify({"msg": "O status da tarefa não foi encontrada."}), 400
     except ObjectNotModified as e:
         return jsonify({"msg": str(e)}), 200
     except Exception as e:
-        print(e)
+        logging.error(f"Erro no sistema: {e}")
         return jsonify({"msg": "Ocorreu um erro inesperado. Por favor, tente mais tarde."}), 500
 
 @task_status_auth_bp.route("/<task_status_id>", methods=["DELETE"])
@@ -86,8 +87,8 @@ def delete(task_status_id) -> jsonify:
             cache.delete(f"task_status_get{get_jwt_identity()}")
             return jsonify({"msg": "Sucesso ao excluir o registro."}), 200
     except AttributeError as e:
-        print(e)
+        logging.error(f"Erro no sistema: {e}")
         return jsonify({"msg": "O status da tarefa não foi encontrada."}), 400
     except Exception as e:
-        print(e)
+        logging.error(f"Erro no sistema: {e}")
         return jsonify({"msg": "Ocorreu um erro inesperado. Por favor, tente mais tarde."}), 500

@@ -3,9 +3,8 @@ from bson.objectid import ObjectId
 from pydantic import BaseModel
 
 from app.api.exception.object_not_modified import ObjectNotModified
-from app.config.db.database import users_collection
+from app.config.db.mongo_connection import MongoConnection
 from app.api.model.user_model import UserModel
-from app.util.format.serialize_util import objectid_to_str
 
 class RepositoryUtil:
     @staticmethod
@@ -37,7 +36,7 @@ class RepositoryUtil:
     def allowed_by_user(collection) -> UserModel:
         user_email = get_jwt_identity()
 
-        user: UserModel = users_collection.find_one({"email": user_email})
+        user: UserModel = MongoConnection.get_collection('user').find_one({"email": user_email})
         RepositoryUtil.exist(user)
 
         return user

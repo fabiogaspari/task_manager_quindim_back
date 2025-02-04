@@ -2,7 +2,7 @@ from flask import request
 from flask_jwt_extended import create_access_token, get_jwt
 
 from app.config.db.database import redis_client
-from app.config.db.database import users_collection
+from app.config.db.mongo_connection import MongoConnection
 from app.api.service.user_service import UserService
 from app.util.auth.auth_util import verify_password
 from app.util.format.serialize_util import objectid_to_str
@@ -27,7 +27,7 @@ class AuthService:
         email = data.get("email")
         password = data.get("password")
 
-        user: UserModel = users_collection.find_one({"email": email})
+        user: UserModel = MongoConnection.get_collection('user').find_one({"email": email})
         
         # verifica se a senha esta correta, para o usuário requisitado
         if not user or not verify_password(user["password"], password):
